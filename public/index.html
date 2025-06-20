@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="__alloy_style.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+<p>AlloyProxy</p>
+<form class="url" method="POST" action="/proxy/session/">
+    <input placeholder="https://www.google.com" name="url" id="iurl" type="text" required>
+    <button type="submit" id="btn">アクセス</button>
+</form>
+</div>
+<script>
+document.querySelector('form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const url = document.getElementById('iurl').value.trim();
+    if (!url) return;
+    
+    try {
+        const response = await fetch('/proxy/session/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({ url: url })
+        });
+
+        const data = await response.json();
+        
+        if (data.redirect) {
+            window.location.href = data.redirect;
+        } else if (data.error) {
+            alert(data.error);
+        }
+    } catch (error) {
+        alert('接続エラーが発生しました。URLを確認して再度お試しください。');
+    }
+});
+</script>
+</body>
+</html>
